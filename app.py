@@ -7,11 +7,14 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 # Load model (compile=False removes warning)
-model = load_model("lie_detector_model.h5", compile=False)
+@st.cache_resource
+def load_resources():
+    model = load_model("lie_detector_model.h5", compile=False)
+    tokenizer = pickle.load(open("tokenizer.pkl", "rb"))
+    encoder = pickle.load(open("encoder.pkl", "rb"))
+    return model, tokenizer, encoder
 
-tokenizer = pickle.load(open("tokenizer.pkl", "rb"))
-encoder = pickle.load(open("encoder.pkl", "rb"))
-
+model, tokenizer, encoder = load_resources()
 def clean_text(text):
     text = str(text).lower()
     text = re.sub(r"http\S+", "", text)
@@ -33,7 +36,7 @@ if st.button("Predict"):
         seq = tokenizer.texts_to_sequences([cleaned])
         padded = pad_sequences(seq, maxlen=50, padding="post", truncating="post")
 
-        prediction = model.predict(padded)
+        prediction = model.predict(padded, verbose=0)
         predicted_class = np.argmax(prediction, axis=1)[0]
         predicted_label = encoder.inverse_transform([predicted_class])[0]
         confidence = float(np.max(prediction)) * 100
