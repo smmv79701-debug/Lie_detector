@@ -1,15 +1,12 @@
 import streamlit as st
 import pickle
-import re
-import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 @st.cache_resource
 def load_resources():
     model = Sequential([
-        Embedding(input_dim=10000, output_dim=128, input_shape=(50,)),
+        Embedding(10000, 128, input_shape=(50,)),
         LSTM(64),
         Dense(32, activation="relu"),
         Dense(6, activation="softmax")
