@@ -9,7 +9,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 # Load model (compile=False removes warning)
 @st.cache_resource
 def load_resources():
-    model = load_model("lie_detector_model.keras", compile=False)
+    model = load_model("model.h5", compile=False)
     tokenizer = pickle.load(open("tokenizer.pkl", "rb"))
     encoder = pickle.load(open("encoder.pkl", "rb"))
     return model, tokenizer, encoder
