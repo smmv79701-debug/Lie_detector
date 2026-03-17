@@ -18,7 +18,7 @@ def load_resources():
         Dense(6, activation="softmax")
     ])
 
-    model.load_weights("model.weights.h5")
+    model.load_weights("final_model1.h5")
 
     with open("tokenizer.pkl", "rb") as f:
         tokenizer = pickle.load(f)
