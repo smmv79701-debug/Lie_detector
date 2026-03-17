@@ -1,7 +1,13 @@
 import streamlit as st
 import pickle
+import re
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+st.set_page_config(page_title="AI Lie Detector", layout="centered")
+st.title("AI Lie Detector")
+st.write("Enter text and check the predicted class.")
 
 @st.cache_resource
 def load_resources():
@@ -22,4 +28,24 @@ def load_resources():
 
     return model, tokenizer, encoder
 
-model, tokenizer, encoder = load_resources()
+with st.spinner("Loading model..."):
+    model, tokenizer, encoder = load_resources()
+
+def clean_text(text):
+    text = str(text).lower()
+    text = re.sub(r"http\\S+", "", text)
+    text = re.sub(r"[^a-zA-Z0-9\\s]", "", text)
+    return text.strip()
+
+user_input = st.text_area("Enter text here")
+
+if st.button("Predict"):
+    if not user_input.strip():
+        st.warning("Please enter some text.")
+    else:
+        cleaned = clean_text(user_input)
+        seq = tokenizer.texts_to_sequences([cleaned])
+        padded = pad_sequences(seq, maxlen=50)
+        pred = model.predict(padded)
+        label = encoder.inverse_transform([pred.argmax(axis=1)[0]])[0]
+        st.success(f"Prediction: {label}")
